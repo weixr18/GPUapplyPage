@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns="http://xmlns.jcp.org/xml/ns/javaee" 
+	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee 
+		http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd" id="WebApp_ID" version="4.0">
+  <display-name>GPUapl2</display-name>
+  
+    <servlet>
+        <servlet-name>FirstServlet</servlet-name>
+        <servlet-class>service.FirstServlet</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>ApplyServlet</servlet-name>
+        <servlet-class>service.ApplyServlet</servlet-class>
+    </servlet>
+    
+    <servlet>
+        <servlet-name>StaticResServlet</servlet-name>
+        <servlet-class>service.StaticResServlet</servlet-class>
+    </servlet>
+
+    <!-- 使用默认servlet处理静态资源请求 --> 
+    <!--后缀名为css/gif/jps/png/js的静态资源不拦截-->
+    <servlet-mapping>
+ 	<servlet-name>StaticResServlet</servlet-name>
+	<url-pattern>*.jpg</url-pattern>
+ 	<url-pattern>*.css</url-pattern>
+ 	<url-pattern>*.js</url-pattern>
+ 	<url-pattern>*.png</url-pattern>
+ 	<url-pattern>*.gif</url-pattern>
+	<url-pattern>*.pdf</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>FirstServlet</servlet-name>
+        <url-pattern>/apply</url-pattern>
+    </servlet-mapping>
+
+<servlet-mapping>
+        <servlet-name>ApplyServlet</servlet-name>
+        <url-pattern>/ApplyServlet</url-pattern>
+    </servlet-mapping>
+  
+  
+  <welcome-file-list>
+    <welcome-file>index.jsp</welcome-file>
+    <welcome-file>default.html</welcome-file>
+    <welcome-file>default.htm</welcome-file>
+    <welcome-file>default.jsp</welcome-file>
+  </welcome-file-list>
+</web-app>
