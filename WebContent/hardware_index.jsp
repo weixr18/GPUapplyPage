@@ -1,6 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@ page language="java" pageEncoding="UTF-8"%>
-<%@ page import="beans.RecordBean"%>
+<%@ page import="beans.HardRecordBean"%>
 <%@ page import="java.util.List"%>
 <%@ page import="java.util.TreeSet"%>
 <%@ page import="java.util.Set"%>
@@ -11,7 +11,6 @@
 <%@ page import="org.json.JSONObject"%>
 
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-
 
 
 <html><head>
@@ -27,33 +26,50 @@
    	</div>
    	
    	<% 
-   	List<RecordBean> appointments = (List<RecordBean>)request.getAttribute("appointments");
+   	List<HardRecordBean> appointments = (List<HardRecordBean>)request.getAttribute("appointments");
+   	String hard_type = (String)request.getAttribute("hard_type");
    	
-   	//获取今天和未来7天的时间
-   	Date currentD = new Date();
-	Date[] dates = new Date[8];
-	String[] datestr = new String[8];
+   	
+   	Date[] start_dates = new Date[6];
+	String[] start_datestr = new String[6];
+	Date[] end_dates = new Date[6];
+	String[] end_datestr = new String[6];
+   	
 	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-	
-	dates[0] = currentD;
-	datestr[0] = sdf.format(currentD);
-	
+   	Date currentD = new Date();
 	Calendar calendar = new GregorianCalendar();
 	calendar.setTime(currentD);
-	for(int i = 1; i < 8; i++)
+	int week_day = calendar.get(Calendar.DAY_OF_WEEK);
+	int add_day = (Calendar.MONDAY-week_day+7)%7;
+	calendar.add(Calendar.DATE, add_day);
+	Date nextMonday = calendar.getTime();
+	
+	start_dates[0]=nextMonday;
+	start_datestr[0]=sdf.format(nextMonday);
+	
+	calendar.add(Calendar.DATE, 6);
+	end_dates[0] = calendar.getTime();
+	end_datestr[0] = sdf.format(end_dates[0]);
+	
+	for(int i=1;i<6;i++)
 	{
 		calendar.add(Calendar.DATE, 1);
-		dates[i] = calendar.getTime();
-		datestr[i] = sdf.format(dates[i]);
+		start_dates[i] = calendar.getTime();
+		start_datestr[i] = sdf.format(start_dates[i]);
+		
+		calendar.add(Calendar.DATE, 6);
+		end_dates[i] = calendar.getTime();
+		end_datestr[i] = sdf.format(end_dates[i]);
 	}
-	request.setAttribute("datestr",datestr);
 	
+	request.setAttribute("start_datestr",start_datestr);
+	request.setAttribute("end_datestr",end_datestr);
 	
 	%>
 
 
     <div id="t1">
-    	申请GPU
+    	申请硬件：<b id="hard_type">${hard_type}</b>
     </div>
     <div id="m">
 	    <div id="t2">
@@ -62,11 +78,7 @@
 	    
 	    <%
 	 	//决定表格显示
-		boolean isBooked[][] = {
-				{false, false, false, false, false, false, false, false}, 
-				{false, false, false, false, false, false, false, false}, 
-				{false, false, false, false, false, false, false, false}, 
-				{false, false, false, false, false, false, false, false}};
+		boolean isBooked[][] = {{false, false, false, false, false, false}};
 	    
 		//获取已提交记录的姓名和学号
 		Set<String> names = new TreeSet<String>();
@@ -74,19 +86,16 @@
 	    
 	    if(appointments != null)
 	    {
-	    	for(RecordBean b: appointments)
+	    	for(HardRecordBean b: appointments)
 			{
-				int date = b.getAppointmentDay().getDate();
-				int period = b.getAppointmentPeriod();
-				if(period <= 0 || period >= 5)
-					continue;
-				
-				for(int i = 0; i < 8; i++)
+				Date start_date = b.getAppointmentStartDay();
+	
+				for(int i = 0; i < 6; i++)
 				{
-					if(date == dates[i].getDate())
+					if(start_date.toString().equals(start_datestr[i]))
 					{
-						isBooked[period-1][i] = true;
-						System.out.printf("isBooked[%d][%d] = true\n", period, i);
+						isBooked[0][i] = true;
+						System.out.printf("isBooked[%d] = true\n", i);
 					}	
 				}
 				names.add(b.getUsername());
@@ -98,79 +107,48 @@
 		json.put("isBooked", isBooked);
 		request.setAttribute("isBooked",json);
 		
-		JSONObject json2 = new JSONObject();
 		json.put("names", names);
 		request.setAttribute("names",json);
 		
-		JSONObject json3 = new JSONObject();
 		json.put("ids", ids);
 		request.setAttribute("ids",json);
 		
-		request.setAttribute("isBooked0",isBooked[0]);
-		request.setAttribute("isBooked1",isBooked[1]);
-		request.setAttribute("isBooked2",isBooked[2]);
-		request.setAttribute("isBooked3",isBooked[3]);
+		String index_type = "hard";
+		json.put("index_type", index_type);
+		request.setAttribute("index_type",json);
+		
+		json.put("hard_type", hard_type);
+		request.setAttribute("hard_type",hard_type);
+		
+		request.setAttribute("isBooked_all",isBooked[0]);
+		//request.setAttribute("isBooked0",isBooked[0]);
+		//request.setAttribute("isBooked1",isBooked[1]);
+		//request.setAttribute("isBooked2",isBooked[2]);
+		//request.setAttribute("isBooked3",isBooked[3]);
+		
 	   	%>
 	   	
 	   	<input type = 'hidden' id = 'isBooked' name = 'isBooked' value = '${isBooked}'></input>
 	   	<input type = 'hidden' id = 'names' name = 'names' value = '${names}'></input>
 	   	<input type = 'hidden' id = 'ids' name = 'ids' value = '${ids}'></input>
-	       
+	   	<input type = 'hidden' id = 'index_type' name = 'index_type' value = '${index_type}'></input>
+	    <input type = 'hidden' id = 'hard_type' name = 'hard_type' value = '${hard_type}'></input>
 	    
     	<div id="d1">
 	    <table id="ta" cellpadding="2" border="1" onclick="TabClick();">
 	    	<tbody>
 	    	<tr bgcolor="#efefef">
 	    		<th>时段\日期</th>
-	    		<c:forEach items="${datestr}" var="date">
-	    			<th>${date}</th>
+	    		<c:forEach items="${start_datestr}" var="start_date" varStatus="data_status">
+	    			<th><span>${start_date}</span><br>~${end_datestr[data_status.index]}</th>
 				</c:forEach>
 			</tr>
 			<tr>
-				<td bgcolor="#efefef">A<br>9:00-13:00</td>
-				<c:forEach items="${isBooked0}" var="ib0">
+				<td bgcolor="#efefef">预约情况</td>
+				<c:forEach items="${isBooked_all}" var="ib0">
 					<c:choose>
 						<c:when test="${ib0}">
 							<th bgcolor="#e0faff">&nbsp;</th>
-						</c:when> 
-						<c:otherwise>  
-							<th>&nbsp;</th>
-						</c:otherwise>
-					</c:choose>	    			
-				</c:forEach>
-			</tr>
-			<tr>
-				<td bgcolor="#efefef">B<br>13:30-18:00</td>
-				<c:forEach items="${isBooked1}" var="ib1">
-					<c:choose>
-						<c:when test="${ib1}">
-							<th bgcolor="#f8fec7">&nbsp;</th>
-						</c:when> 
-						<c:otherwise>  
-							<th>&nbsp;</th>
-						</c:otherwise>
-					</c:choose>	    			
-				</c:forEach>
-			</tr>
-			<tr>
-				<td bgcolor="#efefef">C<br>18:30-22:00</td>
-				<c:forEach items="${isBooked2}" var="ib2">
-					<c:choose>
-						<c:when test="${ib2}">
-							<th bgcolor="#c6ffc6">&nbsp;</th>
-						</c:when> 
-						<c:otherwise>  
-							<th>&nbsp;</th>
-						</c:otherwise>
-					</c:choose>	    			
-				</c:forEach>
-			</tr>
-			<tr>
-				<td bgcolor="#efefef">D<br>22:30-次日8:00</td>
-				<c:forEach items="${isBooked3}" var="ib3">
-					<c:choose>
-						<c:when test="${ib3}">
-							<th bgcolor="#fecfd6">&nbsp;</th>
 						</c:when> 
 						<c:otherwise>  
 							<th>&nbsp;</th>
@@ -216,14 +194,6 @@
 	        </table>
 	        <!--end table tb-->
 	        <center><button id="btn" class="btn">提交</button></center>
-	    </div>
-	    
-	    <div id="t2">
-	    	使用手册
-	    </div>
-	    
-	    <div id="t3">
-	    	<a href="/GPUapl2/documents/README.pdf">自动化系科协服务器申请说明.pdf</a>
 	    </div>
 	    
 	    <!--end div m-->

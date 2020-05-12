@@ -120,3 +120,8 @@ div#t3
 		margin-top: 10px;
 		max-width: 400px;
 		}
+
+b#hard_type
+		{
+			color: red;
+		}

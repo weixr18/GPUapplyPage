@@ -22,7 +22,7 @@ public class FirstServlet extends HttpServlet {
 		System.out.printf("record number = %d\n", crtApnt.size());
 
 		request.setAttribute("appointments", crtApnt);
-		request.getRequestDispatcher("index.jsp").forward(request, response);
+		request.getRequestDispatcher("gpu_index.jsp").forward(request, response);
 
 	}
 }

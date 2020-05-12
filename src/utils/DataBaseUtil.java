@@ -12,7 +12,7 @@ public class DataBaseUtil {
 			Class.forName("com.mysql.cj.jdbc.Driver"); // mysql version 6+:
 														// com.mysql.cj.jdbc.Driver
 			String url = "jdbc:mysql://localhost:3306/apl_sys?serverTimezone=GMT";
-			connection = DriverManager.getConnection(url, "GPUapl", "123456");
+			connection = DriverManager.getConnection(url, "root", "b13319731225");
 			return connection;
 
 		} catch (ClassNotFoundException nfe) {

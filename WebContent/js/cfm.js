@@ -20,15 +20,18 @@ $(function(){
 		var name = $("#username").val()
 		var reg = /20\d{8}/;
 		
+		//var j = jQuery.parseJSON($('#isBooked').val());
 		var j = jQuery.parseJSON($('#isBooked').val());
 		var isB = j.isBooked;
 		
-		var j2 = jQuery.parseJSON($('#names').val());
+		//var j2 = jQuery.parseJSON($('#names').val());
 		var names = j.names;
 		
-		var j3 = jQuery.parseJSON($('#ids').val());
+		//var j3 = jQuery.parseJSON($('#ids').val());
 		var ids = j.ids;
 		
+		//var j4 = jQuery.parseJSON($('#index_type').val());
+		var index_type = j.index_type;
 		
 		if(name==''){
 			alert('请输入姓名！');
@@ -50,7 +53,15 @@ $(function(){
 			$(".input-cfm").val('');
 			$("#id").val('');
 			$("#username").val('');
-			Submit(name, id, row, col);
+			if(index_type=="gpu")
+			{
+				Submit_gpu(name, id, row, col);
+			}
+			else
+			{
+				var hard_type = j.hard_type;
+				Submit_hard(name, id, row, col, hard_type);
+			}
 		}else{
 			alert('验证码错误！请重新输入！');
 			draw(show_num);
@@ -145,9 +156,9 @@ function TabClick()
 /***************申请提交****************/
 
 //提交申请
-function Submit(name, id, row, col)
+function Submit_gpu(name, id, row, col)
 {
-	console.log("进入ajax提交请求环节");
+	console.log("进入gpu ajax提交请求环节");
 	var nowDate = new Date();
 	var ta = document.getElementById("ta");
 	var aptDate = ta.rows[0].cells[col].innerHTML;
@@ -179,3 +190,35 @@ function Submit(name, id, row, col)
         });
 }
 
+function Submit_hard(name, id, row, col, hard_type)
+{
+	console.log("进入hard ajax提交请求环节");
+	var nowDate = new Date();
+	var ta = document.getElementById("ta");
+	var aptDate = ta.rows[0].cells[col].innerHTML;
+	
+	$.ajax({
+        type: "POST",
+        traditional: true,
+        url: "./ApplyServlet_hard", 
+        data: {
+        	"name":name,
+        	"id":id,
+        	"apply_time":nowDate,
+        	"appointment_date":aptDate,
+        	"hard_type": hard_type,
+        },
+        dataType: "json",
+        
+        success: function(data) {
+        	str = "提交成功\n" + "请联系自动化系科协陈华玉取件"+"请您在预定的时间登陆服务器进行使用"
+			alert(str);
+			
+			console.log("insertdate="+data.insertstate);
+			location.reload();
+		},
+		error: function(xhr, type, errorThrown) {
+			alert("提交失败，请重新操作\n" + data);
+		}
+        });
+}

@@ -11,8 +11,16 @@
     </servlet>
 
     <servlet>
+		<servlet-name>FirstServlet_Hard</servlet-name>
+		<servlet-class>service.FirstServlet_Hard</servlet-class>
+    </servlet>
+    <servlet>
         <servlet-name>ApplyServlet</servlet-name>
         <servlet-class>service.ApplyServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ApplyServlet_hard</servlet-name>
+        <servlet-class>service.ApplyServlet_hard</servlet-class>
     </servlet>
     
     <servlet>
@@ -34,19 +42,25 @@
 
     <servlet-mapping>
         <servlet-name>FirstServlet</servlet-name>
-        <url-pattern>/apply</url-pattern>
+        <url-pattern>/serv</url-pattern>
     </servlet-mapping>
 
-<servlet-mapping>
+	<servlet-mapping>
+        <servlet-name>FirstServlet_Hard</servlet-name>
+        <url-pattern>/hard</url-pattern>
+    </servlet-mapping>
+
+	<servlet-mapping>
         <servlet-name>ApplyServlet</servlet-name>
         <url-pattern>/ApplyServlet</url-pattern>
     </servlet-mapping>
-  
-  
-  <welcome-file-list>
-    <welcome-file>index.jsp</welcome-file>
-    <welcome-file>default.html</welcome-file>
-    <welcome-file>default.htm</welcome-file>
-    <welcome-file>default.jsp</welcome-file>
-  </welcome-file-list>
+	
+	<servlet-mapping>
+        <servlet-name>ApplyServlet_hard</servlet-name>
+        <url-pattern>/ApplyServlet_hard</url-pattern>
+    </servlet-mapping>
+	<welcome-file-list>
+		<welcome-file>jump.jsp</welcome-file>
+	</welcome-file-list>
+
 </web-app>
